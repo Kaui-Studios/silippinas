@@ -1,0 +1,14 @@
+/*
+ Theme Name:     Silip Pinas
+ Author:         Elegant Themes
+ Author URI:     https://www.elegantthemes.com
+ Template:       Divi
+ Version:        1.0.0
+*/
+ 
+ 
+/* =Theme customization starts here
+------------------------------------------------------- */
+
+span.count-cat,
+span.count-subcat {padding: 2px 5px; background-color: #e74c3c; font-weight: bold; font-style: italic; color: #FFF; border-radius: 5px;}
