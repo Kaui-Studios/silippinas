@@ -1,0 +1,16 @@
+
+
+Username: admin 
+Password: salad
+Role: Admin
+Notes: All
+
+Username: editor
+Password: salad
+Role: Editor
+*Capabilities: Reviews / Edit / Publish Posts
+
+Username: contributor
+Password: salad
+Role: Contributor
+*Capabilities: Edit own post / Submit own post for review / View published posts
