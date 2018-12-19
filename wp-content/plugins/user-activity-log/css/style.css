@@ -17,7 +17,8 @@ form.sol-form {
     border-right:1px solid #ccc;
     border-top:1px solid #ccc;
     float: left;
-    width: 73%;
+    width: calc(75% - 20px);
+    margin-right: 18px;
 }
 .user_id.column-user_id img {
     float: left;
@@ -76,6 +77,8 @@ form.sol-form {
 
 .ualTabContentWrap .wrap {
     margin-top: 0;
+    display: inline-block;
+    width: 100%;
 }
 .sol-dropdown {
     margin-bottom: 15px;
@@ -514,27 +517,19 @@ td.column-description {
     border: medium none;
     border-radius: 50%;
     box-shadow: 0 0 20px 5px #cccccc inset;
-    font-size: 15px;
-    line-height: 17px;
+    font-size: 14px;
     margin: 0.5em 0.4em 0.5em 0;
     padding: 0;
     position: absolute;
     right: 0;
     top: 0;
     vertical-align: middle;
-    width: 27px;
+    width: 29px;
 }
 #ual-advertisement-popup {
     line-height: 0;
     overflow: hidden;
     padding: 0;
-}
-.ual-advertisement-ui-dialog .ui-dialog-buttonset .ual-btn.ual-btn-gray span {
-    height: 25px;
-    line-height: 25px;
-    min-width: 25px;
-    padding: 0;
-    width: 25px;
 }
 .ual-advertisement-ui-dialog.ui-dialog .ui-dialog-buttonpane {
     height: 0;
@@ -706,19 +701,30 @@ td.column-description {
 #frmDeactivationual {
     width: 64%;
     float: left;
+    margin-bottom: 15px;
 }
 .ual-deactivation {
     padding-top: 5px;
     display: inline-block;
 }
-
+.sol_deactivation_widget {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    overflow: scroll;
+    background: #ffffff;
+}
+.ual-help {
+    display: inline-block;
+    width: calc(100% - 4px);
+}
 @media screen and (max-width : 782px){
     .sol-search-div p.search-box {
         bottom: auto;
         display: inline;
         float: left;
         height: auto;
-        margin-bottom: 0;
+        margin-bottom: 0px;
         position: relative;
     }
     .wp-filter .sol-search-div {
@@ -730,6 +736,20 @@ td.column-description {
     .frm-user-activity .tablenav .tablenav-pages {
         margin-bottom: 10px;
     }
+    table.fixed {
+        table-layout: auto;
+    }
+    .wrap {
+        overflow-x: scroll;
+    }
+    .frm-user-activity .wp-filter > div {
+        margin-bottom: 5px;
+    }
+}
+@media screen and (min-width: 783px) and (max-width: 991px) {
+    table.fixed {
+        table-layout: auto;
+    }
 }
 @media screen and (max-width : 1000px){
     .user-activity-ad-block {
@@ -737,13 +757,41 @@ td.column-description {
         width: 100%;
     }
     form.sol-form {
+        width: calc(100% - 2px);
+        margin-right: 0;
+    }
+    .ualTabContentWrap .wrap {
+        display: inline-block;
         width: 100%;
+        margin-left: 0;
     }
     .sol-box-border {
         box-sizing: border-box;
         max-width: 100%;
         overflow: hidden;
         padding: 0 15px;
+        width: 100%;
+    }
+}
+@media screen and (max-width: 767px) {
+    .sol-email-table th {
+        width: 100%;
+        display: inline-block;
+    }
+    .sol-email-table td {
+        display: inline-block;
+        width: 100%;
+    }
+    .sol-display-roles {
+        width: 100%;
+    }
+    .sol-email-table {
+        display: inline-block;
+        width: 100%;
+        float: none;
+    }
+    .sol-email-table  tr textarea {
+        display: inline-block;
         width: 100%;
     }
 }
@@ -754,6 +802,9 @@ td.column-description {
         margin-top: 0;
         width: 100%;
     }
+    .sol-email-table td input[type="email"] {
+        width: 100%;
+    } 
     .ualpContentDiv form.sol-form {
         margin-top: 20px;
         top:auto;

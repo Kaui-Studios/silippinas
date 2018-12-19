@@ -3,9 +3,9 @@ Contributors: solwininfotech, sanjaydabhoya, khushbupadalia
 Donate link: https://www.solwininfotech.com/product/wordpress-plugins/user-activity-log-pro/
 Tags: admin user log, user log, user, log, user activity, activity log, log user, record user activity, log user action, user action log, wordpress admin security, wordpress security, security, user tracking, user activity monitor, watch user, track user, track user activity, track activity.
 Requires at least: 4.0
-Tested up to: 4.9.6
+Tested up to: 5.0
 Requires PHP: 5.6
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -113,6 +113,12 @@ Monitor and track all backend activities those are done by your freelancers, web
 
 
 == Changelog ==
+
+= 1.3.8 =
+Release date: December 11th, 2018
+
+* Updated: Make compatible with WordPress 5.0
+* Fixed: Solve minor issues
 
 = 1.3.7 =
 Release date: May 22nd, 2018

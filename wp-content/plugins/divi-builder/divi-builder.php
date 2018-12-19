@@ -3,7 +3,7 @@
  * Plugin Name: Divi Builder
  * Plugin URI: http://elegantthemes.com
  * Description: A drag and drop page builder for any WordPress theme.
- * Version: 2.17.6
+ * Version: 2.18.8
  * Author: Elegant Themes
  * Author URI: http://elegantthemes.com
  * License: GPLv2 or later
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'ET_BUILDER_PLUGIN_DIR', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'ET_BUILDER_PLUGIN_URI', plugins_url('', __FILE__) );
-define( 'ET_BUILDER_PLUGIN_VERSION', '2.17.6' );
+define( 'ET_BUILDER_PLUGIN_VERSION', '2.18.8' );
 
 if ( ! class_exists( 'ET_Dashboard_v2' ) ) {
 	require_once( ET_BUILDER_PLUGIN_DIR . 'dashboard/dashboard.php' );
@@ -47,6 +47,8 @@ class ET_Builder_Plugin extends ET_Dashboard_v2 {
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
 
+		add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts_styles' ) );
+
 		add_action( 'admin_init', array( $this, 'construct_dashboard' ) );
 
 		add_action( 'wp_ajax_et_builder_save_settings', array( $this, 'builder_save_settings' ) );
@@ -58,8 +60,6 @@ class ET_Builder_Plugin extends ET_Dashboard_v2 {
 		add_action( 'wp_ajax_et_builder_save_google_api_settings', array( $this, 'save_google_api_settings' ) );
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'et_pb_hide_options_menu' ) );
-
-		add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts_styles' ) );
 
 		add_filter( 'et_shortcodes_strings_handle', array( $this, 'shortcodes_strings_handle' ) );
 

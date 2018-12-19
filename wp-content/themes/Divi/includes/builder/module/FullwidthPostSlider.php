@@ -359,7 +359,7 @@ class ET_Builder_Module_Fullwidth_Post_Slider extends ET_Builder_Module_Type_Pos
 				'toggle_slug'       => 'main_content',
 			),
 			'include_categories' => array(
-				'label'            => esc_html__( 'Include Categories', 'et_builder' ),
+				'label'            => esc_html__( 'INYOOOM', 'et_builder' ),
 				'type'             => 'categories',
 				'option_category'  => 'basic_option',
 				'renderer_options' => array(

@@ -228,10 +228,10 @@ function ual_submit_optin(options) {
 }
 
 function change_thickbox_size_ual() {
-    jQuery(document).find('#TB_window').width('700').height('400').css('margin-left', -700 / 2);
-    jQuery(document).find('#TB_ajaxContent').width('640');
+    jQuery(document).find('#TB_window').width('700').height('auto').css('margin-left', -700 / 2);
+    jQuery(document).find('#TB_ajaxContent').width('640').height('auto');
     var doc_height = jQuery(window).height();
-    var doc_space = doc_height - 400;
+    var doc_space = doc_height - 500;
     if (doc_space > 0) {
         jQuery(document).find('#TB_window').css('margin-top', doc_space / 2);
     }
@@ -248,3 +248,8 @@ function checkOtherDeactivate() {
         jQuery('.sol_deactivation_reason_other_ual').hide();
     }
 }
+
+jQuery(window).resize(function (){
+    change_thickbox_size_ual();
+    jQuery(document).find('#TB_ajaxContent').width('640').height('calc(100% - 50px)');
+});

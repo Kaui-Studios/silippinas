@@ -624,6 +624,17 @@ class ET_Dashboard_v2 {
 								}
 
 								do_action( 'et_' . $this->plugin_name . '_after_save_options', $dashboard_options_temp, $current_option_name, $option, $output );
+
+								// Save Global Option
+								if ( isset( $option['is_global'] ) && $option['is_global'] && isset( $option['main_setting_name'] ) && isset( $option['sub_setting_name'] ) ) {
+									$sanitized_value = $dashboard_options_temp[ $current_option_name ];
+									$main_setting_name = $option['main_setting_name'];
+									$sub_setting_name = $option['sub_setting_name'];
+									et_update_option( '', $sanitized_value, true, $main_setting_name, $sub_setting_name );
+									
+									// Remove global option from the options array
+									unset( $dashboard_options_temp[ $current_option_name ] );
+								}
 							} // end foreach( $options_array as $option )
 						} //if ( isset( $options_array ) )
 					} // end foreach( $value[ 'contents' ] as $key => $value )
@@ -775,7 +786,12 @@ class ET_Dashboard_v2 {
 								}
 							}
 
-							if ( '' !== $sub_array ) {
+							if ( isset( $option['is_global'] ) && $option['is_global'] && isset( $option['main_setting_name'] ) && isset( $option['sub_setting_name'] ) ) {
+								$main_setting_name = $option['main_setting_name'];
+								$sub_setting_name = $option['sub_setting_name'];
+								$global_setting = get_option( $main_setting_name );
+								$current_option_value = isset( $global_setting[$sub_setting_name] ) ? $global_setting[$sub_setting_name] : '';
+							} else if ( '' !== $sub_array ) {
 								$current_option_value = isset( $dashboard_options[$sub_array][$current_option_name] ) ? $dashboard_options[$sub_array][$current_option_name] : '';
 
 								if ( ! isset( $dashboard_options[$sub_array][$current_option_name] ) && isset( $option[ 'default' ] ) ) {

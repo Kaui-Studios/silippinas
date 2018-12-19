@@ -119,7 +119,21 @@ if (!function_exists('ual_user_activity_add')) {
         global $wpdb;
         $table_name = $wpdb->prefix . "ualp_user_activity";
         $post_title = addslashes($post_title);
-        $insert_query = $wpdb->query("INSERT INTO $table_name (post_id,post_title,user_id, user_name, user_role, user_email, ip_address, modified_date, object_type, action) VALUES ('$post_id','$post_title','$current_user_id', '$current_user', '$user_role','$user_mail', '$ip', '$modified_date', '$obj_type', '$action')");
+        $insert_query = $wpdb->insert(
+            $table_name,
+            array(
+                'post_id' => $post_id,
+                'post_title' => $post_title,
+                'user_id' => $current_user_id,
+                'user_name' => $current_user,
+                'user_role' => $user_role,
+                'user_email' => $user_mail,
+                'ip_address' => $ip,
+                'modified_date' => $modified_date,
+                'object_type' => $obj_type,
+                'action' => $action,
+            )
+        );
     }
 
 }
@@ -314,6 +328,24 @@ if (!function_exists('ual_shook_delete_attachment')):
 endif;
 
 /*
+ * Get activity for the post - delete post file
+ *
+ * @param int $post Post ID
+ *
+ */
+
+if (!function_exists('ual_shook_delete_post')):
+
+    function ual_shook_delete_post($post) {
+        $action = "delete post";
+        $obj_type = "post";
+        $post_id = $post;
+        $post_title = get_the_title($post_id);
+        ual_get_activity_function($action, $obj_type, $post_id, $post_title);
+    }
+
+endif;
+/*
  * Get activity for the user - Insert Comment
  *
  * @param int $comment Comment ID
@@ -327,8 +359,8 @@ if (!function_exists('ual_shook_wp_insert_comment')):
         $comment_id = $comment;
         $com = get_comment($comment_id);
         $post_id = $com->comment_post_ID;
-        $post_link = get_edit_post_link($post_id);
-        $post_title = "<a target='blank' href='$post_link'>" . get_the_title($post_id) . "</a>";
+        $post_link = get_the_permalink($post_id);
+        $post_title = "Comment inserted in <a target='blank' href='$post_link'>" . get_the_title($post_id) . "</a>";
         ual_get_activity_function($action, $obj_type, $post_id, $post_title);
     }
 
@@ -348,8 +380,8 @@ if (!function_exists('ual_shook_edit_comment')):
         $comment_id = $comment;
         $com = get_comment($comment_id);
         $post_id = $com->comment_post_ID;
-        $post_link = get_edit_post_link($post_id);
-        $post_title = "<a target='blank' href='$post_link'>" . get_the_title($post_id) . "</a>";
+        $post_link = get_the_permalink($post_id);
+        $post_title = "Comment updated in <a target='blank' href='$post_link'>" . get_the_title($post_id) . "</a>";
         ual_get_activity_function($action, $obj_type, $post_id, $post_title);
     }
 
@@ -369,7 +401,7 @@ if (!function_exists('ual_shook_trash_comment')):
         $comment_id = $comment;
         $com = get_comment($comment_id);
         $post_id = $com->comment_post_ID;
-        $post_title = get_the_title($post_id);
+        $post_title = "Comment deleted from ".get_the_title($post_id);
         ual_get_activity_function($action, $obj_type, $post_id, $post_title);
     }
 
@@ -518,12 +550,31 @@ endif;
 if (!function_exists('ual_shook_wp_update_nav_menu')):
 
     function ual_shook_wp_update_nav_menu($menu) {
-        $action = "update nav menu";
-        $obj_type = "menu";
-        $post_id = $menu;
-        $menu_object = wp_get_nav_menu_object($post_id);
+        if(!isset($_REQUEST["menu"]) || !isset($_REQUEST["action"])) {
+            return;
+        }
+        if($_REQUEST["action"]!= "delete" && $_REQUEST["action"]!= "locations" && $_REQUEST["action"] != "update") {
+            return;
+        }
+        $menu_id = $_REQUEST["menu"];
+        if(!is_nav_menu($menu_id)) {
+            return;
+        }
+        $menu_object = wp_get_nav_menu_object($menu_id);
+        $obj_type = "Menu";
+        $post_id = $menu_id;
         $post_title = $menu_object->name;
-        ual_get_activity_function($action, $obj_type, $post_id, $post_title);
+    
+        if("delete" == $_REQUEST["action"]) {
+            $action = "Deleted nav menu";
+            ual_get_activity_function($action, $obj_type, $post_id, $post_title);
+        } elseif("locations" == $_REQUEST["action"]) {
+            $action = "Updated nav menu location";
+            ual_get_activity_function($action, $obj_type, $post_id, $post_title);
+        } else {
+            $action = "Update nav menu";
+            ual_get_activity_function($action, $obj_type, $post_id, $post_title);
+        }
     }
 
 endif;
@@ -537,30 +588,11 @@ endif;
 if (!function_exists('ual_shook_wp_create_nav_menu')):
 
     function ual_shook_wp_create_nav_menu($menu) {
-        $action = "create nav menu";
+        $action = "created nav menu";
         $obj_type = "menu";
         $post_id = $menu;
         $menu_object = wp_get_nav_menu_object($post_id);
         $post_title = $menu_object->name;
-        ual_get_activity_function($action, $obj_type, $post_id, $post_title);
-    }
-
-endif;
-
-/*
- * Get activity for the user - Delete navigation menu
- *
- * @param int $tt_id Post ID
- * @param string $deleted_term Post Title
- *
- */
-if (!function_exists('ual_shook_delete_nav_menu')):
-
-    function ual_shook_delete_nav_menu($tt_id, $deleted_term) {
-        $action = "delete nav menu";
-        $obj_type = "menu";
-        $post_id = $tt_id;
-        $post_title = $deleted_term->name;
         ual_get_activity_function($action, $obj_type, $post_id, $post_title);
     }
 
@@ -636,6 +668,40 @@ if (!function_exists('ual_shook_activated_plugin')):
 
 endif;
 
+if(!function_exists('ualpHookBeforeEditPost')) {
+
+    function ualpHookBeforeEditPost($post_ID) {
+        global $old_post_data;
+        if (!current_user_can('edit_post',$post_ID)) {
+            return;
+        };        
+        $prev_post_data = get_post($post_ID);
+        $post_type = $prev_post_data->post_type;
+        $post_tax = '';
+        if($post_type != '') {
+            $taxonomy_names = get_object_taxonomies( $post_type );
+            if(is_array($taxonomy_names) && !empty($taxonomy_names)) {
+                foreach($taxonomy_names as $taxonomy_name) {
+                    $post_cats = wp_get_post_terms($post_ID, $taxonomy_name);
+                    $post_cats_ids = array();
+                    foreach($post_cats as $post_cat) {
+                        $post_cats_ids[] = $post_cat->term_id;
+                    }
+                    if(is_array($post_cats_ids) && !empty($post_cats_ids)) {
+                        $post_tax[$taxonomy_name] = $post_cats_ids;
+                    }
+                }
+            }
+        }
+        $old_post_data = array(
+            "post_data" => $prev_post_data,
+            "post_meta" => get_post_custom($post_ID),
+            "post_tax" => $post_tax
+        );
+    }
+}
+add_action("pre_post_update","ualpHookBeforeEditPost",10);
+
 /*
  * Get activity for the user - Activate Plugin
  *
@@ -644,52 +710,43 @@ endif;
  * @param object $post posts
  *
  */
-if (!function_exists('ual_shook_transition_post_status')):
+if (!function_exists('ual_shook_transition_post_status')){
 
     function ual_shook_transition_post_status($post_id, $post) {
-
-        $action = '';
+        global $old_post_data;
+        $old_post_data_detail = $old_post_data['post_data'];
+        if(isset($old_post_data_detail) && $old_post_data_detail != ''){
+            $oldstatus = $old_post_data_detail->post_status;
+        }
+        $newstatus = $post->post_status;
+        $old_status = isset($oldstatus) ? $oldstatus : '';
+        $new_status = isset($newstatus) ? $newstatus : '';
         $obj_type = $post->post_type;
         $post_id = $post->ID;
         $post_title = $post->post_title;
-        $newstatus = $post->post_status;
 
         if ("nav_menu_item" == get_post_type($post) || "wpcf7_contact_form" == get_post_type($post) || wp_is_post_revision($post) || $obj_type == 'customize_changeset') {
             return;
         }
-
-        global $old_post_data;
-
-        $old_post_data_detail = $old_post_data['post_data'];
-        if (isset($old_post_data_detail) && $old_post_data_detail != '') {
-            $oldstatus = $old_post_data_detail->post_status;
+        if ( wp_is_post_revision( $post->ID ) ){
+            return;   
         }
-
-        $old_status = isset($oldstatus) ? $oldstatus : '';
-        $new_status = isset($newstatus) ? $newstatus : '';
-
-        if ( wp_is_post_revision( $post->ID ) )
+        if ( 'auto-draft' === $new_status || ( 'new' === $old_status && 'inherit' === $new_status ) ) {
             return;
-
-        if ('auto-draft' === $new_status || ( 'new' === $old_status && 'inherit' === $new_status )) {
-            return;
-        } elseif ('auto-draft' === $old_status && $new_status === 'draft') {
-            $action = $obj_type . ' drafted';
-        } elseif ('draft' === $old_status && $new_status === 'publish' && $old_post_data['post_data']->post_date_gmt === '0000-00-00 00:00:00') {
-            $action = $obj_type . ' created';
-        } elseif ('trash' === $new_status) {
-            $action = $obj_type . ' trashed';
-        } elseif ('trash' === $old_status) {
-            $action = $obj_type . ' restored';
+        } elseif ( 'auto-draft' === $old_status && $new_status === 'draft' ) {
+            $action = $obj_type .' drafted';
+        } elseif ( 'draft' === $old_status && $new_status === 'publish' && $old_post_data['post_data']->post_date_gmt === '0000-00-00 00:00:00') {
+            $action = $obj_type .' created';
+        } elseif ( 'trash' === $new_status ) {
+            $action = $obj_type .' trashed';
+        } elseif ( 'trash' === $old_status ) {
+            $action = $obj_type .' restored';
         } else {
-            $action = $obj_type . ' updated';
+            $action = $obj_type .' updated';
         }
-
         ual_get_activity_function($action, $obj_type, $post_id, $post_title);
     }
-
-endif;
-
+}
 /*
  * Get activity for the user - Deactivate Plugin
  *
@@ -732,11 +789,11 @@ endif;
 if (!function_exists('ual_shook_export_wp')):
 
     function ual_shook_export_wp($args) {
-        $action = "Export wp";
+        $content = isset( $args['content'] ) ? $args['content'] : 'all';
+        $action = $content." Downloaded";
         $obj_type = "Export";
         $post_id = "";
-        $post_title = $obj_type . ' : ' . isset($args['content']) ? $args['content'] : 'all';
-        ;
+        $post_title = $obj_type . ' : ' . $content;
         ual_get_activity_function($action, $obj_type, $post_id, $post_title);
     }
 
@@ -788,6 +845,7 @@ endif;
 add_action('wp_login', 'ual_shook_wp_login', 20, 2);
 add_action('wp_logout', 'ual_shook_wp_logout');
 add_action('delete_user', 'ual_shook_delete_user');
+add_action('delete_post', 'ual_shook_delete_post', 10, 3);
 add_action('user_register', 'ual_shook_user_register');
 add_action('profile_update', 'ual_shook_profile_update');
 add_action('add_attachment', 'ual_shook_add_attachment');
@@ -799,9 +857,8 @@ add_action('trash_comment', 'ual_shook_trash_comment');
 add_action('spam_comment', 'ual_shook_spam_comment');
 add_action('unspam_comment', 'ual_shook_unspam_comment');
 add_action('delete_comment', 'ual_shook_delete_comment');
-add_action('wp_update_nav_menu', 'ual_shook_wp_update_nav_menu');
+add_action("load-nav-menus.php", 'ual_shook_wp_update_nav_menu');
 add_action('wp_create_nav_menu', 'ual_shook_wp_create_nav_menu');
-add_action('delete_nav_menu', 'ual_shook_delete_nav_menu', 10, 2);
 add_action('activated_plugin', 'ual_shook_activated_plugin');
 add_action('deactivated_plugin', 'ual_shook_deactivated_plugin');
 //add_action('created_term', 'ual_shook_created_term', 10, 2);
@@ -810,7 +867,7 @@ add_action('edited_term', 'ual_shook_edited_term', 10, 3);
 add_action('pre_delete_term', 'ual_shook_delete_term', 10, 2);
 add_action('switch_theme', 'ual_shook_switch_theme');
 add_action('customize_save', 'ual_shook_customize_save');
-add_action('export_wp', 'ual_shook_export_wp', 1);
+add_action('export_wp', 'ual_shook_export_wp');
 add_action('save_post', 'ual_shook_transition_post_status', 100, 2);
 add_action('delete_site_transient_update_themes', 'ual_shook_theme_deleted');
 
@@ -1100,7 +1157,13 @@ if (!function_exists('ual_admin_scripts')) {
 
         wp_register_script('custom_wp_admin_js', plugins_url('js/admin_script.js', __FILE__), array('jquery-ui-dialog'));
         wp_enqueue_script('custom_wp_admin_js');
+        
+        if (is_rtl()) {
+            wp_enqueue_style('ual-style_rtl-css', plugins_url('css/style_rtl.css', __FILE__));
+        }
     }
+
+    
 
 }
 add_action('admin_enqueue_scripts', 'ual_admin_scripts');
@@ -1217,10 +1280,17 @@ if (!function_exists('ual_enable_user_notification_at_login')) {
         $user_role = $user_info->roles[0];
         $user_role_enable = get_option('enable_role_list');
         $user_enabled = get_option('enable_user_list');
-        for ($i = 0; $i < count($user_role_enable); $i++) {
-            if ($user_role_enable[$i] == $user_role) {
-                array_push($user_enabled, $user_info->user_login);
-                update_option('enable_user_list', $user_enabled);
+        if(is_array($user_role_enable)) {
+            for ($i = 0; $i < count($user_role_enable); $i++) {
+                if ($user_role_enable[$i] == $user_role) {
+                    if(is_array($user_enabled)) {
+                        array_push($user_enabled, $user_info->user_login);
+                    }
+                    else {
+                        $user_enabled = array($user_info->user_login);
+                    }
+                    update_option('enable_user_list', $user_enabled);
+                }
             }
         }
     }
@@ -1324,9 +1394,11 @@ if(!function_exists('ualEnableUserForNotification')){
         $enableuser = $_POST['value'];
         $selected = $_POST['selected'];
         if(isset($enableuser) && $enableuser != ''){
-            if ($display == "users") {
-                $enableUserTemp = array();
+            if ($display == "users") {                
                 $enableUserTemp = get_option('enable_user_list_temp',true);
+                if($enableUserTemp == '') {
+                    $enableUserTemp = array();
+                }
                 if($selected == 'true'){
                     if(!in_array($enableuser,$enableUserTemp)){
                         array_push($enableUserTemp, $enableuser);
@@ -1341,10 +1413,11 @@ if(!function_exists('ualEnableUserForNotification')){
                 $enableUserTemp = array_values($enableUserTemp);
                 update_option('enable_user_list_temp', $enableUserTemp);
             }
-            if ($display == "roles") {
-                $enableRoleTemp = array();
+            if ($display == "roles") {                
                 $enableRoleTemp = get_option('enable_role_list_temp',true);
-                
+                if($enableRoleTemp == '') {
+                    $enableRoleTemp = array();
+                }                
                 if($selected == 'true'){
                     if(!in_array($enableuser,$enableRoleTemp)){
                         array_push($enableRoleTemp, $enableuser);

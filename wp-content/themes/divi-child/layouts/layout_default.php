@@ -28,7 +28,12 @@
                  <article id="post-<?php the_ID(); ?>" <?php post_class( 'et_pb_post' ); ?>>
                      <div class="entry-content">
                      <?php
-                         the_content();
+                         //  the_content();
+                        
+                        echo ("<b>SINO/ANO:</b> <span>" . types_render_field('sino-ano', array() ) . "</span>");
+                        echo ("<b>KAILAN/SAAN:</b> <span>" . types_render_field('kailan-saan', array() ) . "</span>");
+                        echo ("<b>PAANO/BAKIT:</b> <span>" . types_render_field('paano-bakit', array() ) . "</span>");
+ 
                      ?>
                      </div> <!-- .entry-content -->
  
@@ -51,7 +56,7 @@
  
                                 <div class="post_meta_custom">
                                     <p>
-                                        <strong>By: </strong><?php the_author(); ?> <br/>
+                                        <strong>By: </strong><?php the_author(); ?> <br/>c
                                         <strong>Region: </strong><?php echo get_the_term_list( $post->ID, 'region', '', ', ', '' ); ?> <br/>
                                         <strong>Province: </strong><?php echo get_the_term_list( $post->ID, 'province', '', ', ', '' ); ?> <br/>
                                     </p>

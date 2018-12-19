@@ -28,7 +28,12 @@
                  <article id="post-<?php the_ID(); ?>" <?php post_class( 'et_pb_post' ); ?>>
                      <div class="entry-content">
                      <?php
-                         the_content();
+                        //   the_content();
+                        
+                        echo ("<b>SINO/ANO:</b> <span>" . types_render_field('sino-ano', array() ) . "</span><br/><br/>");
+                        echo ("<b>KAILAN/SAAN:</b> <span>" . types_render_field('kailan-saan', array() ) . "</span><br/><br/>");
+                        echo ("<b>PAANO/BAKIT:</b> <span>" . types_render_field('paano-bakit', array() ) . "</span>");
+ 
                      ?>
                      </div> <!-- .entry-content -->
  
@@ -139,7 +144,10 @@
                      <?php
                          do_action( 'et_before_content' );
  
-                         the_content();
+                        echo ("<b>SINO/ANO:</b> <span>" . types_render_field('sino-ano', array() ) . "</span><br/><br/>");
+                        echo ("<b>KAILAN/SAAN:</b> <span>" . types_render_field('kailan-saan', array() ) . "</span><br/><br/>");
+                        echo ("<b>PAANO/BAKIT:</b> <span>" . types_render_field('paano-bakit', array() ) . "</span>");
+ 
  
                          wp_link_pages( array( 'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'Divi' ), 'after' => '</div>' ) );
                      ?>

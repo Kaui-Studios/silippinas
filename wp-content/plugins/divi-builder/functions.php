@@ -39,20 +39,31 @@ function et_get_option( $option_name, $default_value = '', $used_for_object = ''
 endif;
 
 if ( ! function_exists( 'et_update_option' ) ) :
-function et_update_option( $option_name, $new_value ){
+function et_update_option( $option_name, $new_value, $is_new_global_setting = false, $global_setting_main_name = '', $global_setting_sub_name = '' ) {
 	global $et_divi_builder_plugin_options;
 
-	$shortname = 'divi_builder_plugin';
+	if ( $is_new_global_setting && '' !== $global_setting_main_name && '' !== $global_setting_sub_name ) {
+		$global_setting = get_option( $global_setting_main_name, array() );
 
-	$et_theme_options_name = 'et_' . $shortname;
+		$global_setting[ $global_setting_sub_name ] = $new_value;
 
-	if ( ! isset( $et_divi_builder_plugin_options ) ) $et_divi_builder_plugin_options = get_option( $et_theme_options_name );
-	$et_divi_builder_plugin_options[$option_name] = $new_value;
+		update_option( $global_setting_main_name, $global_setting );
+	} else {
+		$shortname = 'divi_builder_plugin';
 
-	$option_name = $et_theme_options_name;
-	$new_value = $et_divi_builder_plugin_options;
+		$et_theme_options_name = 'et_' . $shortname;
 
-	update_option( $option_name, $new_value );
+		if ( ! isset( $et_divi_builder_plugin_options ) ) {
+			$et_divi_builder_plugin_options = get_option( $et_theme_options_name );
+		}
+
+		$et_divi_builder_plugin_options[$option_name] = $new_value;
+
+		$option_name = $et_theme_options_name;
+		$new_value = $et_divi_builder_plugin_options;
+
+		update_option( $option_name, $new_value );
+	}
 }
 endif;
 
@@ -195,7 +206,7 @@ function truncate_post( $amount, $echo = true, $post = '' ) {
 	/**
 	 * Filter automatically generated post excerpt before it gets truncated.
 	 *
-	 * @since ??
+	 * @since 2.17
 	 *
 	 * @param string $excerpt
 	 * @param integer $post_id
@@ -407,9 +418,117 @@ endif;
 add_filter( 'body_class', 'et_pb_append_theme_class' );
 
 /**
+ * DBP implementation for BFB enabled check.
+ *
+ * @since 2.18
+ *
+ * @return bool
+ */
+function dbp_filter_bfb_enabled() {
+	global $pagenow;
+
+	$bfb_settings = get_option( 'et_bfb_settings' );
+
+	$enabled = isset( $bfb_settings['enable_bfb'] ) && 'on' === $bfb_settings['enable_bfb'];
+
+	if ( is_admin() && ! in_array( $pagenow, array( 'post.php', 'post-new.php', 'admin-ajax.php' ) ) ) {
+		$enabled = false;
+	} else if ( ! is_admin() && ! isset( $_GET['et_bfb'] ) ) {
+		$enabled = false;
+	}
+
+	return $enabled;
+}
+add_filter( 'et_builder_bfb_enabled', 'dbp_filter_bfb_enabled' );
+
+/**
+ * DBP implementation for fresh install check.
+ *
+ * @since 2.18
+ *
+ * @return bool
+ */
+function dbp_filter_is_fresh_install() {
+	$options = get_option( 'et_pb_builder_options', array() );
+
+	return empty( $options );
+}
+add_filter( 'et_builder_is_fresh_install', 'dbp_filter_is_fresh_install' );
+
+/**
+ * DBP implementation for BFB toggle.
+ *
+ * @since 2.18
+ *
+ * @param bool $enable
+ *
+ * @return void
+ */
+function dbp_action_toggle_bfb( $enable ) {
+	$bfb_value = $enable ? 'on' : 'off';
+
+	et_update_option( '', $bfb_value, true, 'et_bfb_settings', 'enable_bfb' );
+}
+add_action( 'et_builder_toggle_bfb', 'dbp_action_toggle_bfb' );
+
+/**
+ * Theme implementation for show BFB opt-in modal check.
+ *
+ * @since 2.18
+ *
+ * @param bool $default
+ *
+ * @return bool
+ */
+function dbp_filter_show_bfb_optin_modal( $default ) {
+	$options = get_option( 'et_pb_builder_options', array() );
+	$shown = isset( $options['bfb_optin_modal_shown'] ) ? $options['bfb_optin_modal_shown'] : $default;
+
+	if ( is_bool( $shown ) ) {
+		return $shown;
+	}
+
+	// 'true'  = modal has been shown.
+	// 'false' = modal is queued to be shown, but has not had the chance yet.
+	return $shown === 'false';
+}
+add_filter( 'et_builder_show_bfb_optin_modal', 'dbp_filter_show_bfb_optin_modal' );
+
+/**
+ * DBP implementation for BFB opt-in modal shown.
+ *
+ * @since 2.18
+ *
+ * @return void
+ */
+function dbp_action_bfb_optin_modal_shown() {
+	$options = get_option( 'et_pb_builder_options', array() );
+	$options['bfb_optin_modal_shown'] = 'true';
+	update_option( 'et_pb_builder_options', $options );
+}
+add_action( 'et_builder_bfb_optin_modal_shown', 'dbp_action_bfb_optin_modal_shown' );
+
+/**
+ * DBP implementation for queue BFB opt-in modal.
+ *
+ * @since 2.18
+ *
+ * @return void
+ */
+function dbp_action_queue_bfb_optin_modal() {
+	if ( et_builder_bfb_enabled() ) {
+		return;
+	}
+
+	$options = get_option( 'et_pb_builder_options', array() );
+	$options['bfb_optin_modal_shown'] = 'false';
+	update_option( 'et_pb_builder_options', $options );
+}
+add_action( 'et_builder_queue_bfb_optin_modal', 'dbp_action_queue_bfb_optin_modal' );
+/**
  * Filter the list of post types the Divi Builder is enabled on based on plugin options.
  *
- * @since ??
+ * @since 2.10
  *
  * @param array<string, string> $options
  *

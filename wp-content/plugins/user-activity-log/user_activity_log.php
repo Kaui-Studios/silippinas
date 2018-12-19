@@ -5,9 +5,9 @@
  * Description: Log the activity of users and roles to monitor your site with actions
  * Author: Solwin Infotech
  * Author URI: https://www.solwininfotech.com/
- * Version: 1.3.7
+ * Version: 1.3.8
  * Requires at least: 4.0
- * Tested up to: 4.9.6
+ * Tested up to: 5.0
  * Copyright: Solwin Infotech
  * License: GPLv2 or later
  */
@@ -382,7 +382,7 @@ if (!function_exists('ual_user_activity_function')):
         }
         if (isset($_GET['txtsearch']) && $_GET['txtsearch'] != "") {
             $searchtxt = sanitize_text_field($_GET['txtsearch']);
-            $where.=" and user_name like '$searchtxt' or user_role like '$searchtxt' or object_type like '$searchtxt' or action like '$searchtxt'";
+            $where.=" and user_name like '%".$searchtxt."%' or user_role like '%".$searchtxt."%' or object_type like '%".$searchtxt."%' or action like '%".$searchtxt."%'";
         }
 
         // query for display all the user activity data start
@@ -697,7 +697,7 @@ if (!function_exists('ual_user_activity_function')):
                             }
                         } else {
                             echo '<tr class="no-items">';
-                            echo '<td class="colspanchange" colspan="8">' . __('No record found.', 'user-activity-log') . '</td>';
+                            echo '<td class="colspanchange" colspan="9">' . __('No record found.', 'user-activity-log') . '</td>';
                             echo '</tr>';
                         }
                         ?>

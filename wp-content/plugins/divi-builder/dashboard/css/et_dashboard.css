@@ -218,15 +218,13 @@ span.et_pb_value_text.et_pb_on_value {  color: #FFF;  }
 
 
 .et_pb_prompt_field--checkbox-list {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	grid-gap: 10px;
 }
 
 .et_pb_prompt_field--checkbox-list > * {
-	  flex-grow: 0;
-	  flex-shrink: 0;
-	  margin-bottom: 20px;
+	  margin: 0;
 }
 
 .et-panel-box__checkbox-list-label {

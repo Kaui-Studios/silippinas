@@ -1551,7 +1551,7 @@ function et_builder_include_categories_option( $args = array() ) {
 		);
 	}
 
-	$output = '<div id="et_pb_include_categories">' . $output . '</div>';
+	$output = '<div id="et_pb_include_categories">'  . '</div>';
 
 	return apply_filters( 'et_builder_include_categories_option_html', $output );
 }
